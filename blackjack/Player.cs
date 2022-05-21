@@ -1,4 +1,7 @@
-﻿namespace blackjack
+﻿using System;
+
+
+namespace blackjack
 {
     public class Player
     {
@@ -6,24 +9,47 @@
 
         public Player(bool isDealer)
         {
+            _isDealer = isDealer;   
             _balance = isDealer ? 1000000 : 1000;
             _cards = new Card[2];
         }
         
+        ~Player()
+        {
+            Console.WriteLine("[DEBUG] free memory of player");
+        }
+        
         // Functions
 
-        public void ExtendArray() // Pass by reference
+        private void ExtendArray() // Pass by reference
         {
-            Card[] localArray = new Card[_cards.Length];
-            for (int i = 0; i < _cards.Length; i++)
+            var localArray = new Card[_cards.Length];
+            for (var i = 0; i < _cards.Length; i++)
             {
                 localArray[i] = _cards[i];
             }
 
             _cards = new Card[_cards.Length + 1];
-            localArray = null;
+            for (var i = 0; i < localArray.Length; i++)
+            {
+                _cards[i] = localArray[i];
+            }
         }
-
+        
+        public void ClearArray()
+        {
+            _cards = new Card[2];
+            _cardsRealLength = 0;
+            _bet = 0;
+        }
+        
+        public void ClearPlayer()
+        {
+            ClearArray();
+            _balance = _isDealer ? 1000000 : 1000;
+            _bet = 0;
+        }
+        
         public void AddCard(Card card)
         {
             if (_cardsRealLength == _cards.Length - 1)
@@ -33,8 +59,9 @@
             _cards[_cardsRealLength] = card;
             _cardsRealLength++;
         }
-        
-        
+
+        public Card[] GetCards() { return _cards; }
+
         // getter & setter
         public void DecreaseMoney(int decreaseBy) { _balance -= decreaseBy; }
         public void IncreaseMoney(int increaseBy) { _balance += increaseBy;}
@@ -51,6 +78,7 @@
         private int _balance;
         private Card[] _cards;
         private int _cardsRealLength = 0;
+        private bool _isDealer;
 
     }
 }
