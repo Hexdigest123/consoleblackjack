@@ -6,11 +6,7 @@ namespace blackjack
     {
 
         // Constructor & Destructor
-
-        public Card()
-        {
-            
-        }
+        
         public Card(int iconIndex, int cardIndex)
         {
             switch (iconIndex)
@@ -71,11 +67,6 @@ namespace blackjack
                     _valueOfCard = Ace;
                     break;
             }
-        }
-
-        ~Card()
-        {
-            Console.WriteLine("[DEBUG] free memory of card");
         }
 
         // Functions
