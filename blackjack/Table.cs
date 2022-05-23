@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Threading;
 
 namespace blackjack
 {
@@ -11,20 +13,55 @@ namespace blackjack
         {
             _player = new Player(false);
             _headlessDealer = new Player(true);
+            _cardDeck = new Card[10];
             GameLoop();
-        }
-        
-        ~Table()
-        {
-            Console.WriteLine("[DEBUG] free memory of table");
         }
         
         // Functions 
 
+        private void ExtendCardDeck()
+        {
+            var localArray = new Card[_cardDeck.Length];
+            for (var i = 0; i < _cardDeck.Length; i++)
+            {
+                localArray[i] = _cardDeck[i];
+            }
+
+            _cardDeck = new Card[_cardDeck.Length + 10];
+            for (var i = 0; i < localArray.Length; i++)
+            {
+                _cardDeck[i] = localArray[i];
+            }
+        }
+
+        private Card CreateCard()
+        {
+            Card newCard = null;
+            newCard = new Card(_rand.Next(4), _rand.Next(13));
+            if(_cardDeckRealLength+1 == _cardDeck.Length) ExtendCardDeck();
+
+            foreach (var card in _cardDeck)
+            {
+                if (card == null) break;
+                if (card.GetIconSymbol() != newCard.GetIconSymbol() &&
+                    card.GetValueOfCard() != newCard.GetValueOfCard()) continue;
+                
+                newCard = new Card(_rand.Next(4), _rand.Next(13));
+                
+                if (card.GetIconSymbol() != newCard.GetIconSymbol() &&
+                    card.GetValueOfCard() != newCard.GetValueOfCard()) continue;
+                newCard = new Card(_rand.Next(4), _rand.Next(13));
+            }
+            
+            _cardDeck[_cardDeckRealLength] = newCard;
+            _cardDeckRealLength++;
+            return newCard;
+        }
+
         private void ResetGame()
         {
             Console.WriteLine("Reset Game");
-            System.Threading.Thread.Sleep(3000);
+            Thread.Sleep(1000);
             _finishedCardPicking = false;
             _player.ClearPlayer();
             _player.ClearPlayer();
@@ -32,7 +69,7 @@ namespace blackjack
 
         private void ResetRound()
         {
-            System.Threading.Thread.Sleep(3000);
+            Thread.Sleep(3000);
             _finishedCardPicking = false;
             _player.ClearArray();
             _headlessDealer.ClearArray();
@@ -73,6 +110,15 @@ namespace blackjack
 
         private void GameLogic()
         {
+            if (_finishedCardPicking)
+            {
+                if (CountCards(_player.GetCards()) == CountCards(_headlessDealer.GetCards()))
+                {
+                    Console.WriteLine("No one Won!");
+                    ResetRound();
+                    GameLoop();
+                }
+            }
             if (CountCards(_player.GetCards()) == 21)
             {
                 Console.WriteLine("You Won!\nPlayer Blackjack\n");
@@ -89,7 +135,7 @@ namespace blackjack
                     }
                     else
                     {
-                        System.Environment.Exit(0);
+                        Environment.Exit(0);
                     }
                     
                 }
@@ -115,7 +161,7 @@ namespace blackjack
                     }
                     else
                     {
-                        System.Environment.Exit(0);
+                        Environment.Exit(0);
                     }
                     
                 }
@@ -140,7 +186,7 @@ namespace blackjack
                     }
                     else
                     {
-                        System.Environment.Exit(0);
+                        Environment.Exit(0);
                     }
                     
                 }
@@ -163,7 +209,7 @@ namespace blackjack
                     }
                     else
                     {
-                        System.Environment.Exit(0);
+                        Environment.Exit(0);
                     }
                     
                 }
@@ -172,12 +218,7 @@ namespace blackjack
             }
             
             if (!_finishedCardPicking) return;
-            if (CountCards(_player.GetCards()) == CountCards(_headlessDealer.GetCards()))
-            {
-                Console.WriteLine("No one Won!");
-                ResetRound();
-                GameLoop();
-            }
+            
             if (CountCards(_player.GetCards()) > CountCards(_headlessDealer.GetCards()))
             {
                 Console.WriteLine($"You won!\nYou won with a Deck worth of: {CountCards(_player.GetCards()).ToString()}");
@@ -194,7 +235,7 @@ namespace blackjack
                     }
                     else
                     {
-                        System.Environment.Exit(0);
+                        Environment.Exit(0);
                     }
                     
                 }
@@ -218,7 +259,7 @@ namespace blackjack
                     }
                     else
                     {
-                        System.Environment.Exit(0);
+                        Environment.Exit(0);
                     }
                     
                 }
@@ -250,21 +291,24 @@ namespace blackjack
         private void DealerPickCards()
         {
             var rand = new Random();
-            if (CountCards(_headlessDealer.GetCards()) < 17) return;
+            if (CountCards(_headlessDealer.GetCards()) >= 17) return;
 
             if (CountCards(_headlessDealer.GetCards()) > 15)
             {
-                _headlessDealer.AddCard(new Card(rand.Next(3), rand.Next(12)));
+                _headlessDealer.AddCard(CreateCard());
             }else if (CountCards(_headlessDealer.GetCards()) > 10)
             {
-                _headlessDealer.AddCard(new Card(rand.Next(3), rand.Next(12)));
-                _headlessDealer.AddCard(new Card(rand.Next(3), rand.Next(12)));
+                _headlessDealer.AddCard(CreateCard());
+                if (CountCards(_headlessDealer.GetCards()) >= 20) return;
+                _headlessDealer.AddCard(CreateCard());
             }
             else
             {
-                _headlessDealer.AddCard(new Card(rand.Next(3), rand.Next(12)));
-                _headlessDealer.AddCard(new Card(rand.Next(3), rand.Next(12)));
-                _headlessDealer.AddCard(new Card(rand.Next(3), rand.Next(12)));
+                _headlessDealer.AddCard(CreateCard());
+                if (CountCards(_headlessDealer.GetCards()) >= 20) return;
+                _headlessDealer.AddCard(CreateCard());
+                if (CountCards(_headlessDealer.GetCards()) >= 20) return;
+                _headlessDealer.AddCard(CreateCard());
             }
         }
         
@@ -279,7 +323,7 @@ namespace blackjack
                 }
                 else
                 {
-                    System.Environment.Exit(0);
+                    Environment.Exit(0);
                 }
             }
 
@@ -288,10 +332,14 @@ namespace blackjack
                 ClearConsole();
                 Console.WriteLine($"Your current balance: {Convert.ToString(_player.GetBalance())}\n\n");
 
-                Console.Write("Welcome to your seat, how much you want to bet [only integer values]: ");
+                Console.Write("Welcome to your seat, how much you want to bet [only positive integer values]: ");
                 try
                 {
                     var playerBet = Convert.ToInt32(Console.ReadLine());
+                    if (playerBet <= 0)
+                    {
+                        throw new ArgumentException();
+                    }
                     if (playerBet > _player.GetBalance())
                     {
                         playerBet = _player.GetBalance();
@@ -303,20 +351,19 @@ namespace blackjack
                 catch (Exception)
                 {
                     Console.WriteLine("!pls read the the instructions!\n");
-                    System.Threading.Thread.Sleep(3000);
+                    Thread.Sleep(3000);
                     continue;
                 }
                 
                 ClearConsole();
                 Console.WriteLine($"Your bet is: {Convert.ToString(_player.GetBet())}\n");
-                System.Threading.Thread.Sleep(1000);
-                    
-                var rand = new Random();
-                _player.AddCard(new Card(rand.Next(3), rand.Next(12)));
-                _player.AddCard(new Card(rand.Next(3), rand.Next(12)));
+                Thread.Sleep(1000);
+                
+                _player.AddCard(CreateCard());
+                _player.AddCard(CreateCard());
 
-                _headlessDealer.AddCard(new Card(rand.Next(3), rand.Next(12)));
-                _headlessDealer.AddCard(new Card(rand.Next(3), rand.Next(12)));
+                _headlessDealer.AddCard(CreateCard());
+                _headlessDealer.AddCard(CreateCard());
 
                 Card[] playerCards = _player.GetCards();
                 Card[] dealerCards = _headlessDealer.GetCards();
@@ -338,7 +385,7 @@ namespace blackjack
                    switch (choice)
                    {
                        case "1":
-                           _player.AddCard(new Card(rand.Next(3), rand.Next(12)));
+                           _player.AddCard(CreateCard());
                            break;
                        case "2":
                            _finishedCardPicking = true;
@@ -351,12 +398,17 @@ namespace blackjack
             }
         }
         
-        private void ClearConsole(){ System.Console.Clear(); }
+        private void ClearConsole(){ Console.Clear(); }
         
         // Private variables
 
-        private bool _gameStarted = false;
-        private bool _finishedCardPicking = false;
+        private readonly Random _rand = new Random();
+        
+        private Card[] _cardDeck;
+        private int _cardDeckRealLength = 0;
+        
+        private bool _gameStarted;
+        private bool _finishedCardPicking;
         
         private readonly Player _player;
         private readonly Player _headlessDealer;

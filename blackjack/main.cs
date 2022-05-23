@@ -1,12 +1,4 @@
-﻿
-
-// Constructor & Destructor
-        
-// Functions
-        
-// Private variables
-
-using System;
+﻿using System;
 
 namespace blackjack
 {
@@ -14,8 +6,8 @@ namespace blackjack
     {
         public static void Main(string[] args)
         {
-            System.Console.Title = "Blackjack - Pierre-Maurice Merckel";
-            System.Console.Clear();
+            Console.Title = "Blackjack - Pierre-Maurice Merckel";
+            Console.Clear();
             var gameTable = new Table();
         }
     }
