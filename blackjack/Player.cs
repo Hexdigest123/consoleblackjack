@@ -1,5 +1,6 @@
 ﻿using System;
 
+
 namespace blackjack
 {
     public class Player
@@ -13,9 +14,14 @@ namespace blackjack
             _cards = new Card[2];
         }
         
+        ~Player()
+        {
+            Console.WriteLine("[DEBUG] free memory of player");
+        }
+        
         // Functions
 
-        private void ExtendArray()
+        private void ExtendArray() // Pass by reference
         {
             var localArray = new Card[_cards.Length];
             for (var i = 0; i < _cards.Length; i++)
@@ -71,8 +77,8 @@ namespace blackjack
         private int _bet;
         private int _balance;
         private Card[] _cards;
-        private int _cardsRealLength;
-        private readonly bool _isDealer;
+        private int _cardsRealLength = 0;
+        private bool _isDealer;
 
     }
 }
