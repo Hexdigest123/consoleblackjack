@@ -14,9 +14,7 @@ namespace blackjack
     {
         public static void Main(string[] args)
         {
-            System.Console.Title = "Blackjack - Pierre-Maurice Merckel";
-            System.Console.Clear();
-            var gameTable = new Table();
+            Table gameTable = new Table();
         }
     }
 }
