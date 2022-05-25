@@ -9,7 +9,7 @@ namespace blackjack
         
         // Constructor & Destructor
 
-        public Table()
+        public Table() // constructor to initialize variables for Table
         {
             _player = new Player(false);
             _headlessDealer = new Player(true);
@@ -19,7 +19,7 @@ namespace blackjack
         
         // Functions 
 
-        private void ExtendCardDeck()
+        private void ExtendCardDeck() // extend card deck similar to Player.cs "Extend Array"
         {
             var localArray = new Card[_cardDeck.Length];
             for (var i = 0; i < _cardDeck.Length; i++)
@@ -34,7 +34,7 @@ namespace blackjack
             }
         }
 
-        private Card CreateCard()
+        private Card CreateCard() // create Card object 
         {
             Card newCard = null;
             newCard = new Card(_rand.Next(4), _rand.Next(13));
@@ -58,7 +58,7 @@ namespace blackjack
             return newCard;
         }
 
-        private void ResetGame()
+        private void ResetGame() // reset game if player has no money or dealer has no money
         {
             Console.WriteLine("Reset Game");
             Thread.Sleep(1000);
@@ -67,7 +67,7 @@ namespace blackjack
             _player.ClearPlayer();
         }
 
-        private void ResetRound()
+        private void ResetRound() // reset round when someone won
         {
             Thread.Sleep(3000);
             _finishedCardPicking = false;
@@ -75,7 +75,7 @@ namespace blackjack
             _headlessDealer.ClearArray();
         }
         
-        private int CountCards(Card[] array)
+        private int CountCards(Card[] array) // count cards to get the value of deck
         {
             int value = 0;
             foreach (var card in array)
@@ -90,7 +90,7 @@ namespace blackjack
             return value;
         }
 
-        private void ShowCards(Card[] array, String name)
+        private void ShowCards(Card[] array, String name) // display cards on console
         {
             Console.WriteLine($"{name} Deck: ");
             foreach (var card in array)
@@ -108,7 +108,7 @@ namespace blackjack
             Console.WriteLine("\n");
         }
 
-        private void GameLogic()
+        private void GameLogic() // whole game logic from blackjack
         {
             if (_finishedCardPicking)
             {
@@ -270,7 +270,7 @@ namespace blackjack
 
         }
         
-        private void SortCards(ref Card[] array)
+        private void SortCards(ref Card[] array) // sort cards for deck
         {
             // selection sort
 
@@ -286,12 +286,16 @@ namespace blackjack
                 (array[smallest], array[i]) = (array[i], array[smallest]);
             }
             
-        }
+        } 
 
-        private void DealerPickCards()
+        private void DealerPickCards() // after player took his cards dealer will also take some cards
         {
             var rand = new Random();
-            if (CountCards(_headlessDealer.GetCards()) >= 17) return;
+            
+            if(CountCards(_headlessDealer.GetCards()) < CountCards(_player.GetCards())) 
+                _headlessDealer.AddCard(CreateCard());
+            
+            if(CountCards(_headlessDealer.GetCards()) >= CountCards(_player.GetCards())) return;
 
             if (CountCards(_headlessDealer.GetCards()) > 15)
             {
@@ -299,20 +303,23 @@ namespace blackjack
             }else if (CountCards(_headlessDealer.GetCards()) > 10)
             {
                 _headlessDealer.AddCard(CreateCard());
+                if(CountCards(_headlessDealer.GetCards()) >= CountCards(_player.GetCards())) return;
                 if (CountCards(_headlessDealer.GetCards()) >= 20) return;
                 _headlessDealer.AddCard(CreateCard());
             }
             else
             {
                 _headlessDealer.AddCard(CreateCard());
+                if(CountCards(_headlessDealer.GetCards()) >= CountCards(_player.GetCards())) return;
                 if (CountCards(_headlessDealer.GetCards()) >= 20) return;
                 _headlessDealer.AddCard(CreateCard());
+                if(CountCards(_headlessDealer.GetCards()) >= CountCards(_player.GetCards())) return;
                 if (CountCards(_headlessDealer.GetCards()) >= 20) return;
                 _headlessDealer.AddCard(CreateCard());
             }
         }
         
-        private void GameLoop()
+        private void GameLoop() // game loop to keep game working
         {
             while (!_gameStarted)
             {
@@ -398,7 +405,7 @@ namespace blackjack
             }
         }
         
-        private void ClearConsole(){ Console.Clear(); }
+        private void ClearConsole(){ Console.Clear(); } // just to clear to console
         
         // Private variables
 

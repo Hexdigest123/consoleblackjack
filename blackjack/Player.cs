@@ -15,7 +15,7 @@ namespace blackjack
         
         // Functions
 
-        private void ExtendArray()
+        private void ExtendArray() // extend Card array
         {
             var localArray = new Card[_cards.Length];
             for (var i = 0; i < _cards.Length; i++)
@@ -30,21 +30,21 @@ namespace blackjack
             }
         }
         
-        public void ClearArray()
+        public void ClearArray() // clear Array after Round
         {
             _cards = new Card[2];
             _cardsRealLength = 0;
             _bet = 0;
         }
         
-        public void ClearPlayer()
+        public void ClearPlayer() // reset Player to basic stats
         {
             ClearArray();
             _balance = _isDealer ? 1000000 : 1000;
             _bet = 0;
         }
         
-        public void AddCard(Card card)
+        public void AddCard(Card card) // give Card to Player
         {
             if (_cardsRealLength == _cards.Length - 1)
             {
